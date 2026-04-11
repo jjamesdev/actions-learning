@@ -1,0 +1,25 @@
+name: Anatomía del workflow
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  explorar:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Imprimir información del evento
+        run: |
+          echo "Hola mundo desde GitHub Actions!"
+          echo "Branch: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Fecha: ${{ github.event.head_commit.timestamp }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "SO: ${{ runner.os }}"
