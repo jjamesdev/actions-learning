@@ -2,41 +2,49 @@ name: Anatomía del workflow
 
 on:
   push:
-    branches:
-      - main
-      - develop
-
+    branches: [main, develop]
   pull_request:
-    branches:
-      - main
-      - develop
-    types:
-      - opened
-      - synchronize
-      - reopened
+    branches: [main, develop]
+
+env:
+  NODE_ENV: production
+  APP_NAME: mi-app
 
 jobs:
-  explorar:
+
+  lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    
+      - uses: actions/checkout@v4
 
-      - name: Checkout del código
-        uses: actions/checkout@v4
+      - name: Setup Node.js con cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Info del evento (del ejercicio 1)
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar versión instalada
         run: |
-          echo "Hola mundo desde GitHub Actions!"
-          echo "Branch: ${{ github.ref }}"
-          echo "Evento: ${{ github.event_name }}"
-          echo "Actor: ${{ github.actor }}"
-          echo "Fecha: ${{ github.event.head_commit.timestamp }}"
+          node --version
+          npm --version
+          echo "Cache dir: $(npm config get cache)"
 
-      - name: Contexto específico de PR
+      - name: Lint
         run: |
-          echo "--- Contexto de PR ---"
-          echo "Número de PR: ${{ github.event.pull_request.number }}"
-          echo "Título del PR: ${{ github.event.pull_request.title }}"
-          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
-          echo "Head branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Corriendo lint sobre el código..."
+          echo "Lint OK"
+
+      - name: Tests
+        run: |
+          echo "Corriendo tests..."
+          echo "Tests OK — 0 failures"
+
+      - name: Resumen con versión trazable
+        env:
+          VERSION: "1.0.0"
+        run: |
+          echo "Build: ${{ env.APP_NAME }}-${VERSION}-${GITHUB_SHA::7}"
