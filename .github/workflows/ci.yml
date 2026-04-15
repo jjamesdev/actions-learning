@@ -17,6 +17,7 @@ jobs:
         run: |
           echo "Corriendo lint..."
           echo "Lint OK — sin errores de estilo"
+          exit 1
 
   # ── JOB 2 ─────────────────────────────
   test:
