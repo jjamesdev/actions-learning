@@ -6,48 +6,53 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Variables a nivel de workflow completo
+env:
+  NODE_ENV: production
+  APP_NAME: mi-app
+
 jobs:
 
-  # ── JOB 1 ─────────────────────────────
-  lint:
+  contextos:
     runs-on: ubuntu-latest
+
+    # Variables a nivel de job
+    env:
+      APP_VERSION: 1.0.0
+
     steps:
       - uses: actions/checkout@v4
-      - name: Ejecutar lint
-        run: |
-          echo "Corriendo lint..."
-          echo "Lint OK — sin errores de estilo"
-          exit 1
 
-  # ── JOB 2 ─────────────────────────────
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Ejecutar tests
+      - name: Contexto github
         run: |
-          echo "Corriendo tests..."
-          echo "Tests OK — 42 passed, 0 failed"
+          echo "── contexto github ──"
+          echo "actor:     ${{ github.actor }}"
+          echo "repo:      ${{ github.repository }}"
+          echo "evento:    ${{ github.event_name }}"
+          echo "ref:       ${{ github.ref }}"
+          echo "ref_name:  ${{ github.ref_name }}"
+          echo "sha corto: ${GITHUB_SHA::7}"
+          echo "run_id:    ${{ github.run_id }}"
 
-  # ── JOB 3 ─────────────────────────────
-  build:
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    steps:
-      - uses: actions/checkout@v4
-      - name: Construir el proyecto
+      - name: Contexto env
+        env:
+          BUILD_DATE: "2026-04-14"
         run: |
-          echo "Construyendo el proyecto..."
-          echo "Build OK — artefacto generado"
+          echo "── contexto env ──"
+          echo "NODE_ENV:    ${{ env.NODE_ENV }}"
+          echo "APP_NAME:    ${{ env.APP_NAME }}"
+          echo "APP_VERSION: ${{ env.APP_VERSION }}"
+          echo "BUILD_DATE:  ${{ env.BUILD_DATE }}"
+          echo "VERSION_TAG: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-${GITHUB_SHA::7}"
 
-  # ── JOB 4 ─────────────────────────────
-  resumen:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Resumen del pipeline
+      - name: Contexto runner
         run: |
-          echo "✓ Pipeline completado"
-          echo "lint   → ${{ needs.lint.result }}"
-          echo "test   → ${{ needs.test.result }}"
-          echo "build  → ${{ needs.build.result }}"
+          echo "── contexto runner ──"
+          echo "os:   ${{ runner.os }}"
+          echo "arch: ${{ runner.arch }}"
+          echo "temp: ${{ runner.temp }}"
+
+      - name: Contexto job
+        run: |
+          echo "── contexto job ──"
+          echo "status: ${{ job.status }}"
