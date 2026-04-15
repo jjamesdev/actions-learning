@@ -10,15 +10,13 @@ on:
 env:
   NODE_ENV: production
   APP_NAME: mi-app
+  APP_VERSION: 1.0.0
 
 jobs:
 
   contextos:
     runs-on: ubuntu-latest
-
-    # Variables a nivel de job
-    env:
-      APP_VERSION: 1.0.0
+      
 
     steps:
       - uses: actions/checkout@v4
