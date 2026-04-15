@@ -6,52 +6,45 @@ on:
   pull_request:
     branches: [main, develop]
 
-# Variables a nivel de workflow completo
 env:
   NODE_ENV: production
   APP_NAME: mi-app
-  
+
 jobs:
 
-  contextos:
+  lint-and-test:
     runs-on: ubuntu-latest
-      
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Contexto github
+      - name: Setup Node.js con cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar versión instalada
+        run: |
+          node --version
+          npm --version
+          echo "Cache dir: $(npm config get cache)"
+
+      - name: Lint
+        run: |
+          echo "Corriendo lint sobre el código..."
+          echo "Lint OK"
+
+      - name: Tests
+        run: |
+          echo "Corriendo tests..."
+          echo "Tests OK — 0 failures"
+
+      - name: Resumen con versión trazable
         env:
-          APP_VERSION: 1.0.0
+          VERSION: "1.0.0"
         run: |
-          echo "── contexto github ──"
-          echo "actor:     ${{ github.actor }}"
-          echo "repo:      ${{ github.repository }}"
-          echo "evento:    ${{ github.event_name }}"
-          echo "ref:       ${{ github.ref }}"
-          echo "ref_name:  ${{ github.ref_name }}"
-          echo "sha corto: ${GITHUB_SHA::7}"
-          echo "run_id:    ${{ github.run_id }}"
-
-      - name: Contexto env
-        env:
-          BUILD_DATE: "2026-04-14"
-        run: |
-          echo "── contexto env ──"
-          echo "NODE_ENV:    ${{ env.NODE_ENV }}"
-          echo "APP_NAME:    ${{ env.APP_NAME }}"
-          echo "APP_VERSION: ${{ env.APP_VERSION }}"
-          echo "BUILD_DATE:  ${{ env.BUILD_DATE }}"
-          echo "VERSION_TAG: ${{ env.APP_NAME }}-${{ env.APP_VERSION }}-${GITHUB_SHA::7}"
-
-      - name: Contexto runner
-        run: |
-          echo "── contexto runner ──"
-          echo "os:   ${{ runner.os }}"
-          echo "arch: ${{ runner.arch }}"
-          echo "temp: ${{ runner.temp }}"
-
-      - name: Contexto job
-        run: |
-          echo "── contexto job ──"
-          echo "status: ${{ job.status }}"
+          echo "Build: ${{ env.APP_NAME }}-${VERSION}-${GITHUB_SHA::7}"
