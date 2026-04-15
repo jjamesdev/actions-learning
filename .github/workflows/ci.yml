@@ -6,6 +6,15 @@ on:
       - main
       - develop
 
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
 jobs:
   explorar:
     runs-on: ubuntu-latest
@@ -15,11 +24,18 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Imprimir información del evento
+      - name: Info del evento (del ejercicio 1)
         run: |
           echo "Hola mundo desde GitHub Actions!"
           echo "Branch: ${{ github.ref }}"
+          echo "Evento: ${{ github.event_name }}"
           echo "Actor: ${{ github.actor }}"
           echo "Fecha: ${{ github.event.head_commit.timestamp }}"
-          echo "SHA: ${{ github.sha }}"
-          echo "SO: ${{ runner.os }}"
+
+      - name: Contexto específico de PR
+        run: |
+          echo "--- Contexto de PR ---"
+          echo "Número de PR: ${{ github.event.pull_request.number }}"
+          echo "Título del PR: ${{ github.event.pull_request.title }}"
+          echo "Base branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Head branch: ${{ github.event.pull_request.head.ref }}"
